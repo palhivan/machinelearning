@@ -1,0 +1,59 @@
+---
+title: "Machine,  Course project:
+predicting class of exercise execution "
+output: html_document
+---
+###Executive summary
+The basic goal of this assignment is to create algorithm for determening class of the task.ns.
+
+
+### Data processing
+
+Data is as provided in file
+```{r, cache=TRUE, warning=FALSE}
+library(caret)
+library(randomForest)
+training <-read.csv("pml-training.csv")
+testing <-read.csv("pml-testing.csv")
+
+train<- training[training$new_window=='no',c(2,7,8,9,10,11,c(37:49),c(60:68),84,85,86,102,c(113:124),140,c(151:160))]
+
+```
+
+
+
+
+
+### Model
+
+Applying principal components
+
+```{r}
+preprocfit<- preProcess(train[,c(-1,-55)],method='pca',thresh=0.9)
+trainPC<- predict(preprocfit,train[,c(-1,-55)])
+finaltrain<- cbind(train[,c(1,55)],trainPC)
+
+```
+
+Random Forest was used for algorithm
+
+```{r, warning=FALSE}
+modfit<- randomForest(classe~ . ,data =finaltrain,mtry=3 )
+      
+
+   
+```
+
+Expected error
+
+```{r}
+modfit
+```
+
+Confusionmatrix
+
+
+```{r}
+confusionMatrix(train$classe,predict(modfit,finaltrain))
+```
+
